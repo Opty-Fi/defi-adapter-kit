@@ -30,16 +30,14 @@ const NETWORK = process.env.NETWORK || "hardhat";
 
 // Prevent to load scripts before compilation and typechain
 if (!SKIP_LOAD) {
-  ["1_ethereum", "2_matic", "3_avalanche", "4_arbitrum", "5_xdai", "6_fantom", "7_bsc", "8_oethereum"].forEach(
-    folder => {
-      const tasksPath = join(__dirname, "tasks", folder);
-      fs.readdirSync(tasksPath)
-        .filter(pth => pth.includes(".ts"))
-        .forEach(task => {
-          require(`${tasksPath}/${task}`);
-        });
-    },
-  );
+  ["1_ethereum"].forEach(folder => {
+    const tasksPath = join(__dirname, "tasks", folder);
+    fs.readdirSync(tasksPath)
+      .filter(pth => pth.includes(".ts"))
+      .forEach(task => {
+        require(`${tasksPath}/${task}`);
+      });
+  });
   require("./tasks/accounts");
   require("./tasks/clean");
 }

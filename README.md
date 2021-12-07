@@ -64,6 +64,8 @@ yarn install
 - All other functions can be directly tested from the DeFiAdapter contract.
 - The unit test for `HarvestFinanceAdapter.sol` can be found in [HarvestFinanceAdapter.ts](./test/adapters/HarvestFinanceAdapter.ts)
 
+#### [Developer tips](./MANUAL.md)
+
 #### Useful commands
 
 | Usage                                                                           | Command            |

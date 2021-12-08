@@ -30,16 +30,17 @@ yarn install
 
 ### What is a DeFiAdapter
 
-- DeFi adapter is a vital building block for executing [opty.fi](https://opty.fi)'s network of strategies.
+- DeFi adapter is a vital building block for executing [opty.fi](https://opty.fi)'s network of strategies. It is the bridge that allows our vaults to invest in a protocol.
 - Specifications for DeFi adapter help perform :
   - transactions like deposit, withdraw, staking, un-staking, adding liquidity, claim reward and harvesting of the reward.
   - read calls for liquidity pool token contract address, liquidity pool token balance, staked token balance, balance in underlying token of both staked and non-staked liquidity pool token, unclaimed reward tokens and reward token contract address
 - A DeFi Adapter smart contract requires implementation of following interfaces :
   - [IAdapter.sol](./contracts/interfaces/opty/IAdapter.sol) **(Mandatory)**
   - [IAdapterHarvestReward.sol](./contracts/interfaces/opty/IAdapterHarvestReward.sol) **(Optional)**
-  - [IAdapterStaking.sol](./contracts/interfaces/opty/IAdapterStaking.sol) **(Optional)**
   - [IAdapterBorrow.sol](./contracts/interfaces/opty/IAdapterBorrow.sol) **(Optional)**
   - [IAdapterInvestmentLimit.sol](./contracts/interfaces/opty/IAdapterInvestmentLimit.sol) **(Optional)**
+
+**Note:** as you may have noticed, IAdapterStaking.sol is not included in the list above. OptyFi's dev team have decided to consider staking as a new deposit so you will need to create a different adapter to support that feature. That means that, in `getDepositCodes` function, one of the adapters will include the logic to deposit underlying tokens and the other one will include the logic to stake the LP tokens received after depositing using the first adapter. This also means that `canStake` function will return `false` in all the adapters.
 
 > Pro Tip : Inherit IAdapterFull interface from [IAdapterFull.sol](./contracts/interfaces/opty/IAdapterFull.sol) to Adapter Contract if the protocol you choose required implementation of all the above interfaces.
 
@@ -56,6 +57,7 @@ yarn install
 #### Step #3 - Implementing `IAdapter` interface
 
 - Implement an adapter contract using above interface(s) similar to [HarvestFinanceAdapter.sol](./contracts/adapters/HarvestFinanceAdapters.sol)
+- Use these [developer tips](./MANUAL.md)
 
 #### Step #4 - Unit Tests
 
@@ -63,8 +65,6 @@ yarn install
 - You might want to use a test utility contract like [TestDeFiAdapter](./contracts/mock/TestDeFiAdapter.sol) for creating a sandbox environment to execute the transaction based on function signature and target address returned from `getCodes()`-style functions from DeFiAdapter.
 - All other functions can be directly tested from the DeFiAdapter contract.
 - The unit test for `HarvestFinanceAdapter.sol` can be found in [HarvestFinanceAdapter.ts](./test/adapters/HarvestFinanceAdapter.ts)
-
-#### [Developer tips](./MANUAL.md)
 
 #### Useful commands
 

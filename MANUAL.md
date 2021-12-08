@@ -32,7 +32,7 @@ In other protocols, they usually have auto-explanatory names, but it can happen 
 
 #### ETH or WETH?
 
-Some protocols accept ETH, WETH, or even both, so code your adapter accordingly. _If the protocol accepts ETH, you will have to create an ETH gateway_ contract the same way we did it for Compound.
+Some protocols accept ETH, WETH, or even both, so code your adapter accordingly. _If the protocol accepts ETH, you will have to create an ETH gateway_ contract the same way we did it for Compound, Aave V1, Curve.
 
 #### Different versions
 
@@ -45,3 +45,5 @@ Some protocols implement withdrawal fees (usually a percentage of the withdrawn 
 #### Contact the team
 
 Have in mind that OptyFi’s team have already created a bunch of adapters. Don’t hesitate to contact them to solve your doubts. It can happen that you face a protocol that doesn’t work like the previous ones we have created, so it could be useful to reach out to someone that unblocks you.
+
+[OptyFi's Discord](https://discord.gg/P3kJPgpS)

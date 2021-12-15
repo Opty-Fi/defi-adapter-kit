@@ -28,13 +28,15 @@ Proceed with installing dependencies:
 yarn install
 ```
 
+One of the most important dependencies is @optyfi/defi-legos. In that package, OptyFi's dev team has included all the interfaces that need to be implemented in order to create a proper adapter. You will find the links below.
+
 ### What is a DeFiAdapter
 
 - DeFi adapter is a vital building block for executing [opty.fi](https://opty.fi)'s network of strategies. It is the bridge that allows our vaults to invest in a protocol.
 - Specifications for DeFi adapter help perform :
   - transactions like deposit, withdraw, staking, un-staking, adding liquidity, claim reward and harvesting of the reward.
   - read calls for liquidity pool token contract address, liquidity pool token balance, staked token balance, balance in underlying token of both staked and non-staked liquidity pool token, unclaimed reward tokens and reward token contract address
-- A DeFi Adapter smart contract requires implementation of following interfaces :
+- A DeFi Adapter smart contract requires implementation of following interfaces:
   - [IAdapter.sol](https://github.com/Opty-Fi/defi-legos/tree/main/src/interfaces/defiAdapters/contracts/IAdapter.sol) **(Mandatory)**
   - [IAdapterInvestLimit.sol](https://github.com/Opty-Fi/defi-legos/tree/main/src/interfaces/defiAdapters/contracts/IAdapterInvestLimit.sol) **(Mandatory)**
   - [IAdapterHarvestReward.sol](https://github.com/Opty-Fi/defi-legos/tree/main/src/interfaces/defiAdapters/contracts/IAdapterHarvestReward.sol) **(Optional)**
@@ -68,16 +70,19 @@ yarn install
 
 #### Useful commands
 
-| Usage                                                                           | Command            |
-| ------------------------------------------------------------------------------- | ------------------ |
-| Compile the smart contracts with Hardhat                                        | `$ yarn compile`   |
-| Compile the smart contracts and generate TypeChain artifacts                    | `$ yarn typechain` |
-| Lint the Solidity Code                                                          | `$ yarn lint:sol`  |
-| Lint the TypeScript Code                                                        | `$ yarn lint:ts`   |
-| Run the Mocha tests                                                             | `$ yarn test`      |
-| Generate the code coverage report                                               | `$ yarn coverage`  |
-| Delete the smart contract artifacts, the coverage reports and the Hardhat cache | `$ yarn clean`     |
-| Deploy the adapter to Hardhat Network                                           | `$ yarn deploy`    |
+| Usage                                                                           | Command                                |
+| ------------------------------------------------------------------------------- | -------------------------------------- |
+| Compile the smart contracts with Hardhat                                        | `$ yarn compile`                       |
+| Compile the smart contracts and generate TypeChain artifacts                    | `$ yarn typechain`                     |
+| Lint the Solidity Code                                                          | `$ yarn lint:sol`                      |
+| Lint the TypeScript Code                                                        | `$ yarn lint:ts`                       |
+| Run the Mocha tests                                                             | `$ yarn test:<name_of_the_chain>:fork` |
+| Run the Mocha tests for an Ethereum adapter                                     | `$ yarn test:ethereum:fork`            |
+| Generate the code coverage report                                               | `$ yarn coverage`                      |
+| Delete the smart contract artifacts, the coverage reports and the Hardhat cache | `$ yarn clean`                         |
+| Deploy the adapter to Hardhat Network                                           | `$ yarn deploy`                        |
+
+> You can find all the scripts in [package.json](./package.json)
 
 #### Syntax Highlighting
 

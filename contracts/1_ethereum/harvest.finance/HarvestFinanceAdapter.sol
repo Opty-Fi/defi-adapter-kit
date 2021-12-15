@@ -10,12 +10,14 @@ pragma experimental ABIEncoderV2;
 
 //  libraries
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
 //  interfaces
 import { IHarvestDeposit } from "@optyfi/defi-legos/ethereum/harvest.finance/contracts/IHarvestDeposit.sol";
 import { IHarvestFarm } from "@optyfi/defi-legos/ethereum/harvest.finance/contracts/IHarvestFarm.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IAdapter } from "@optyfi/defi-legos/interfaces/defiAdapters/contracts/IAdapter.sol";
+import "@optyfi/defi-legos/interfaces/defiAdapters/contracts/IAdapterInvestLimit.sol";
 import { IAdapterStaking } from "@optyfi/defi-legos/interfaces/defiAdapters/contracts/IAdapterStaking.sol";
 import { IAdapterHarvestReward } from "@optyfi/defi-legos/interfaces/defiAdapters/contracts/IAdapterHarvestReward.sol";
 import { IUniswapV2Router02 } from "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
@@ -26,11 +28,12 @@ import { IUniswapV2Router02 } from "@uniswap/v2-periphery/contracts/interfaces/I
  * @dev Abstraction layer to harvest finance's pools
  */
 
-contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaking {
+contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaking, IAdapterInvestLimit {
     using SafeMath for uint256;
+    using Address for address;
 
-    /** @notice Maps liquidityPool to staking vault */
-    mapping(address => address) public liquidityPoolToStakingVault;
+    /** @notice max deposit value datatypes */
+    MaxExposure public maxDepositProtocolMode;
 
     /**
      * @notice Uniswap V2 router contract address
@@ -72,6 +75,18 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
     /** @notice Harvest.finance's reward token address */
     address public constant rewardToken = address(0xa0246c9032bC3A600820415aE600c6388619A14D);
 
+    /** @notice max deposit's default value in percentage */
+    uint256 public maxDepositProtocolPct; // basis points
+
+    /** @notice Maps liquidityPool to staking vault */
+    mapping(address => address) public liquidityPoolToStakingVault;
+
+    /** @notice  Maps liquidityPool to max deposit value in percentage */
+    mapping(address => uint256) public maxDepositPoolPct; // basis points
+
+    /** @notice  Maps liquidityPool to max deposit value in absolute value for a specific token */
+    mapping(address => mapping(address => uint256)) public maxDepositAmount;
+
     constructor() public {
         liquidityPoolToStakingVault[TBTC_SBTC_CRV_DEPOSIT_POOL] = TBTC_SBTC_CRV_STAKE_VAULT;
         liquidityPoolToStakingVault[THREE_CRV_DEPOSIT_POOL] = THREE_CRV_STAKE_VAULT;
@@ -87,6 +102,47 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
         liquidityPoolToStakingVault[F_CDAI_CUSDC_DEPOSIT_POOL] = F_CDAI_CUSDC_STAKE_VAULT;
         liquidityPoolToStakingVault[F_USDN_THREE_CRV_DEPOSIT_POOL] = F_USDN_THREE_CRV_STAKE_VAULT;
         liquidityPoolToStakingVault[F_YDAI_YUSDC_YUSDT_YBUSD_DEPOSIT_POOL] = F_YDAI_YUSDC_YUSDT_YBUSD_STAKE_VAULT;
+        setMaxDepositProtocolPct(uint256(10000)); // 100% (basis points)
+        setMaxDepositProtocolMode(MaxExposure.Pct);
+    }
+
+    /**
+     * @inheritdoc IAdapterInvestLimit
+     */
+    function setMaxDepositPoolPct(address _liquidityPool, uint256 _maxDepositPoolPct) external override {
+        require(_liquidityPool.isContract(), "!isContract");
+        maxDepositPoolPct[_liquidityPool] = _maxDepositPoolPct;
+        emit LogMaxDepositPoolPct(maxDepositPoolPct[_liquidityPool], msg.sender);
+    }
+
+    /**
+     * @inheritdoc IAdapterInvestLimit
+     */
+    function setMaxDepositAmount(
+        address _liquidityPool,
+        address _underlyingToken,
+        uint256 _maxDepositAmount
+    ) external override {
+        require(_liquidityPool.isContract(), "!_liquidityPool.isContract()");
+        require(_underlyingToken.isContract(), "!_underlyingToken.isContract()");
+        maxDepositAmount[_liquidityPool][_underlyingToken] = _maxDepositAmount;
+        emit LogMaxDepositAmount(maxDepositAmount[_liquidityPool][_underlyingToken], msg.sender);
+    }
+
+    /**
+     * @inheritdoc IAdapterInvestLimit
+     */
+    function setMaxDepositProtocolMode(MaxExposure _mode) public override {
+        maxDepositProtocolMode = _mode;
+        emit LogMaxDepositProtocolMode(maxDepositProtocolMode, msg.sender);
+    }
+
+    /**
+     * @inheritdoc IAdapterInvestLimit
+     */
+    function setMaxDepositProtocolPct(uint256 _maxDepositProtocolPct) public override {
+        maxDepositProtocolPct = _maxDepositProtocolPct;
+        emit LogMaxDepositProtocolPct(maxDepositProtocolPct, msg.sender);
     }
 
     /**
@@ -276,7 +332,8 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
         address _liquidityPool,
         uint256 _amount
     ) public view override returns (bytes[] memory _codes) {
-        if (_amount > 0) {
+        uint256 _depositAmount = _getDepositAmount(_liquidityPool, _underlyingToken, _amount);
+        if (_depositAmount > 0) {
             _codes = new bytes[](3);
             _codes[0] = abi.encode(
                 _underlyingToken,
@@ -284,9 +341,9 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
             );
             _codes[1] = abi.encode(
                 _underlyingToken,
-                abi.encodeWithSignature("approve(address,uint256)", _liquidityPool, _amount)
+                abi.encodeWithSignature("approve(address,uint256)", _liquidityPool, _depositAmount)
             );
-            _codes[2] = abi.encode(_liquidityPool, abi.encodeWithSignature("deposit(uint256)", _amount));
+            _codes[2] = abi.encode(_liquidityPool, abi.encodeWithSignature("deposit(uint256)", _depositAmount));
         }
     }
 
@@ -494,6 +551,38 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
             _codes[0] = getUnstakeSomeCodes(_liquidityPool, _redeemAmount)[0];
             _codes[1] = getWithdrawSomeCodes(_vault, _underlyingToken, _liquidityPool, _redeemAmount)[0];
         }
+    }
+
+    /**
+     * @dev Returns the maximum allowed deposit amount considering the percentage limit or the absolute limit
+     * @param _liquidityPool Liquidity pool's contract address
+     * @param _underlyingToken Token address acting as underlying Asset for the vault contract
+     * @param _amount The amount of the underlying token to be deposited
+     * @return Returns the maximum deposit allowed according to _amount and the limits set
+     */
+    function _getDepositAmount(
+        address _liquidityPool,
+        address _underlyingToken,
+        uint256 _amount
+    ) internal view returns (uint256) {
+        uint256 _limit = maxDepositProtocolMode == MaxExposure.Pct
+            ? _getMaxDepositAmountByPct(_liquidityPool)
+            : maxDepositAmount[_liquidityPool][_underlyingToken];
+        return _amount > _limit ? _limit : _amount;
+    }
+
+    /**
+     * @dev Returns the maximum allowed deposit amount when the adapter is in percentage mode
+     * @param _liquidityPool Liquidity pool's contract address
+     * @return Returns the maximum deposit allowed according to _amount and the limits set
+     */
+    function _getMaxDepositAmountByPct(address _liquidityPool) internal view returns (uint256) {
+        uint256 _poolValue = getPoolValue(_liquidityPool, address(0));
+        uint256 _poolPct = maxDepositPoolPct[_liquidityPool];
+        uint256 _limit = _poolPct == 0
+            ? _poolValue.mul(maxDepositProtocolPct).div(uint256(10000))
+            : _poolValue.mul(_poolPct).div(uint256(10000));
+        return _limit;
     }
 
     /**

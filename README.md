@@ -35,14 +35,14 @@ yarn install
   - transactions like deposit, withdraw, staking, un-staking, adding liquidity, claim reward and harvesting of the reward.
   - read calls for liquidity pool token contract address, liquidity pool token balance, staked token balance, balance in underlying token of both staked and non-staked liquidity pool token, unclaimed reward tokens and reward token contract address
 - A DeFi Adapter smart contract requires implementation of following interfaces :
-  - [IAdapter.sol](./contracts/interfaces/opty/IAdapter.sol) **(Mandatory)**
-  - [IAdapterHarvestReward.sol](./contracts/interfaces/opty/IAdapterHarvestReward.sol) **(Optional)**
-  - [IAdapterBorrow.sol](./contracts/interfaces/opty/IAdapterBorrow.sol) **(Optional)**
-  - [IAdapterInvestmentLimit.sol](./contracts/interfaces/opty/IAdapterInvestmentLimit.sol) **(Optional)**
+  - [IAdapter.sol](https://github.com/Opty-Fi/defi-legos/tree/main/src/interfaces/defiAdapters/contracts/IAdapter.sol) **(Mandatory)**
+  - [IAdapterInvestLimit.sol](https://github.com/Opty-Fi/defi-legos/tree/main/src/interfaces/defiAdapters/contracts/IAdapterInvestLimit.sol) **(Mandatory)**
+  - [IAdapterHarvestReward.sol](https://github.com/Opty-Fi/defi-legos/tree/main/src/interfaces/defiAdapters/contracts/IAdapterHarvestReward.sol) **(Optional)**
+  - [IAdapterBorrow.sol](https://github.com/Opty-Fi/defi-legos/tree/main/src/interfaces/defiAdapters/contracts/IAdapterBorrow.sol) **(Optional)**
 
 **Note:** as you may have noticed, IAdapterStaking.sol is not included in the list above. OptyFi's dev team have decided to consider staking as a new deposit so you will need to create a different adapter to support that feature. That means that, in `getDepositCodes` function, one of the adapters will include the logic to deposit underlying tokens and the other one will include the logic to stake the LP tokens received after depositing using the first adapter. This also means that `canStake` function will return `false` in all the adapters.
 
-> Pro Tip : Inherit IAdapterFull interface from [IAdapterFull.sol](./contracts/interfaces/opty/IAdapterFull.sol) to Adapter Contract if the protocol you choose required implementation of all the above interfaces.
+> Pro Tip : Inherit IAdapterFull interface from [IAdapterFull.sol](https://github.com/Opty-Fi/defi-legos/tree/main/src/interfaces/defiAdapters/contracts/IAdapterFull.sol) to Adapter Contract if the protocol you choose required implementation of all the above interfaces.
 
 ### Developing DeFiAdapter
 

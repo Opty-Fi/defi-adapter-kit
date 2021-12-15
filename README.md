@@ -52,11 +52,11 @@ yarn install
 
 #### Step #2 - Pool, LP token and underlying token(s) address gathering
 
-- Choose a DeFi protocol and gather the pool contract addresses similar to [harvest.finance-pools.json](./test/harvest.finance-pools.json).
+- Choose a DeFi protocol and gather the pool contract addresses similar to [harvest.finance-pools.json](./test/1_ethereum/harvest.finance/harvest.finance-pools.json).
 
 #### Step #3 - Implementing `IAdapter` interface
 
-- Implement an adapter contract using above interface(s) similar to [HarvestFinanceAdapter.sol](./contracts/adapters/HarvestFinanceAdapters.sol)
+- Implement an adapter contract using above interface(s) similar to [HarvestFinanceAdapter.sol](./contracts/1_ethereum/harvest.finance//HarvestFinanceAdapter.sol)
 - Use these [developer tips](./MANUAL.md)
 
 #### Step #4 - Unit Tests
@@ -64,7 +64,7 @@ yarn install
 - Write unit tests for all the functions across all the pool contracts gathered in Step 1.
 - You might want to use a test utility contract like [TestDeFiAdapter](./contracts/mock/TestDeFiAdapter.sol) for creating a sandbox environment to execute the transaction based on function signature and target address returned from `getCodes()`-style functions from DeFiAdapter.
 - All other functions can be directly tested from the DeFiAdapter contract.
-- The unit test for `HarvestFinanceAdapter.sol` can be found in [HarvestFinanceAdapter.ts](./test/adapters/HarvestFinanceAdapter.ts)
+- The unit test for `HarvestFinanceAdapter.sol` can be found in [HarvestFinanceAdapter.ts](./test/1_ethereum/harvest.finance/HarvestFinanceAdapter.ts)
 
 #### Useful commands
 

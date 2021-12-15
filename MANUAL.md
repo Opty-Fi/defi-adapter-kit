@@ -46,4 +46,8 @@ Some protocols implement withdrawal fees (usually a percentage of the withdrawn 
 
 Have in mind that OptyFi’s team have already created a bunch of adapters. Don’t hesitate to contact them to solve your doubts. It can happen that you face a protocol that doesn’t work like the previous ones we have created, so it could be useful to reach out to someone that unblocks you.
 
-[OptyFi's Discord](https://discord.com/channels/839603941419646990/879375531789910056)
+[Technical questions](mailto:mario@opty.fi)
+
+[Project management questions](mailto:emeka@opty.fi)
+
+[OptyFi's protocols integrations channel](https://discord.com/channels/839603941419646990/879375531789910056)

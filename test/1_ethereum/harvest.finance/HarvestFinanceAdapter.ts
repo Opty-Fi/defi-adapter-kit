@@ -6,11 +6,28 @@ import { HarvestFinanceAdapter } from "../../../typechain/HarvestFinanceAdapter"
 import { TestDeFiAdapter } from "../../../typechain/TestDeFiAdapter";
 import { LiquidityPool, Signers } from "../types";
 import { shouldBehaveLikeHarvestFinanceAdapter } from "./HarvestFinanceAdapter.behavior";
-import { default as HarvestFinancePools } from "./harvest.finance-pools.json";
+import { default as HarvestExports } from "@optyfi/defi-legos/ethereum/harvest.finance/contracts";
 import { IUniswapV2Router02 } from "../../../typechain";
 import { getOverrideOptions } from "../../utils";
 
 const { deployContract } = hre.waffle;
+
+const HarvestFinancePools = {
+  dai: {
+    pool: HarvestExports.harvestV1Pools.dai.pool,
+    stakingPool: HarvestExports.harvestV1Pools.dai.stakingVault,
+    lpToken: HarvestExports.harvestV1Pools.dai.lpToken,
+    tokens: HarvestExports.harvestV1Pools.dai.tokens,
+    rewardTokens: ["0xa0246c9032bC3A600820415aE600c6388619A14D"],
+  },
+  usdt: {
+    pool: HarvestExports.harvestV1Pools.usdt.pool,
+    stakingPool: HarvestExports.harvestV1Pools.usdt.stakingVault,
+    lpToken: HarvestExports.harvestV1Pools.usdt.lpToken,
+    tokens: HarvestExports.harvestV1Pools.usdt.tokens,
+    rewardTokens: ["0xa0246c9032bC3A600820415aE600c6388619A14D"],
+  },
+};
 
 describe("Unit tests", function () {
   before(async function () {
@@ -45,7 +62,12 @@ describe("Unit tests", function () {
     // deploy Harvest Finance Adapter
     const harvestFinanceAdapterArtifact: Artifact = await hre.artifacts.readArtifact("HarvestFinanceAdapter");
     this.harvestFinanceAdapter = <HarvestFinanceAdapter>(
-      await deployContract(this.signers.deployer, harvestFinanceAdapterArtifact, [], getOverrideOptions())
+      await deployContract(
+        this.signers.deployer,
+        harvestFinanceAdapterArtifact,
+        ["0x99fa011e33a8c6196869dec7bc407e896ba67fe3"],
+        getOverrideOptions(),
+      )
     );
 
     // deploy TestDeFiAdapter Contract

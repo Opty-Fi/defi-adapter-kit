@@ -113,6 +113,17 @@ contract HarvestFinanceAdapter is
     }
 
     /**
+     * @notice Map the liquidity pool to its Staking vault address
+     * @param _liquidityPool liquidity pool address to be mapped with staking vault
+     * @param _stakingVault staking vault address to be linked with liquidity pool
+     */
+    function setLiquidityPoolToStakingVault(address _liquidityPool, address _stakingVault) public onlyOperator {
+        require(_liquidityPool.isContract(), "!_liquidityPool.isContract()");
+        require(_stakingVault.isContract(), "!_stakingVault.isContract()");
+        liquidityPoolToStakingVault[_liquidityPool] = _stakingVault;
+    }
+
+    /**
      * @inheritdoc IAdapterInvestLimit
      */
     function setMaxDepositPoolPct(address _liquidityPool, uint256 _maxDepositPoolPct)
@@ -680,10 +691,12 @@ contract HarvestFinanceAdapter is
         address _underlyingToken,
         uint256 _amount
     ) internal view returns (uint256) {
-        uint256[] memory _amountsA = IUniswapV2Router02(uniswapV2Router02).getAmountsOut(
-            _amount,
-            _getPath(_rewardToken, _underlyingToken)
-        );
-        return _amountsA[_amountsA.length - 1];
+        try
+            IUniswapV2Router02(uniswapV2Router02).getAmountsOut(_amount, _getPath(_rewardToken, _underlyingToken))
+        returns (uint256[] memory _amountsA) {
+            return _amountsA[_amountsA.length - 1];
+        } catch {
+            return 0;
+        }
     }
 }

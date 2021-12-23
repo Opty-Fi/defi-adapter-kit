@@ -244,7 +244,7 @@ contract HarvestFinanceAdapter is
     {
         address _stakingVault = liquidityPoolToStakingVault[_liquidityPool];
         _codes = new bytes[](1);
-        _codes[0] = abi.encode(_stakingVault, abi.encodeWithSignature("getReward()"));
+        _codes[0] = abi.encode(_stakingVault, abi.encodeCall(IHarvestFarm(_stakingVault).getReward, ()));
     }
 
     /**

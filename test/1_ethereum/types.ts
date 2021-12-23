@@ -13,9 +13,6 @@ export interface Signers {
   charlie: SignerWithAddress;
   dave: SignerWithAddress;
   eve: SignerWithAddress;
-  daiWhale: SignerWithAddress;
-  usdtWhale: SignerWithAddress;
-  wethWhale: SignerWithAddress;
 }
 
 export interface PoolItem {

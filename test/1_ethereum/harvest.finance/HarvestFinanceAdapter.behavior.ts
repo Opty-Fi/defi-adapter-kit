@@ -8,6 +8,8 @@ import { getOverrideOptions } from "../../utils";
 
 chai.use(solidity);
 
+const rewardToken = "0xa0246c9032bC3A600820415aE600c6388619A14D";
+
 export function shouldBehaveLikeHarvestFinanceAdapter(token: string, pool: PoolItem): void {
   it(`should deposit ${token}, stake f${token}, claim FARM, harvest FARM, unstake f${token}, and withdraw f${token} in ${token} pool of Harvest Finance`, async function () {
     // harvest finance's deposit vault instance
@@ -17,7 +19,7 @@ export function shouldBehaveLikeHarvestFinanceAdapter(token: string, pool: PoolI
     // harvest finance's staking vault instance
     const harvestStakingInstance = await hre.ethers.getContractAt("IHarvestFarm", pool.stakingPool as string);
     // harvest finance reward token's instance
-    const farmRewardInstance = await hre.ethers.getContractAt("IERC20", (pool.rewardTokens as string[])[0]);
+    const farmRewardInstance = await hre.ethers.getContractAt("IERC20", rewardToken);
     // underlying token instance
     const underlyingTokenInstance = await hre.ethers.getContractAt("IERC20", pool.tokens[0]);
     // 1. deposit all underlying tokens
@@ -73,7 +75,7 @@ export function shouldBehaveLikeHarvestFinanceAdapter(token: string, pool: PoolI
     expect(actualStakedLPTokenBalanceAfterStake).to.be.eq(expectedStakedLPTokenBalanceAfterStake);
     // 2.2 assert whether the reward token is as expected or not
     const actualRewardToken = await this.harvestFinanceAdapter.getRewardToken(pool.pool);
-    const expectedRewardToken = (pool.rewardTokens as string[])[0];
+    const expectedRewardToken = rewardToken;
     expect(getAddress(actualRewardToken)).to.be.eq(getAddress(expectedRewardToken));
     // 2.3 make a transaction for mining a block to get finite unclaimed reward amount
     await this.signers.admin.sendTransaction({

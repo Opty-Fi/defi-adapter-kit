@@ -34,28 +34,13 @@ describe("Unit tests", function () {
     this.signers = {} as Signers;
     const DAI_ADDRESS: string = getAddress("0x6b175474e89094c44da98b954eedeac495271d0f");
     const USDT_ADDRESS: string = getAddress("0xdac17f958d2ee523a2206206994597c13d831ec7");
-    const DAI_WHALE: string = getAddress("0x47ac0fb4f2d84898e4d9e7b4dab3c24507a6d503");
-    const USDT_WHALE: string = getAddress("0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503");
     const signers: SignerWithAddress[] = await hre.ethers.getSigners();
-    const dai20 = await hre.ethers.getContractAt("ERC20", DAI_ADDRESS);
-    await setTokenBalanceInStorage(dai20, signers[4].address, "200");
-    console.log(await dai20.balanceOf(signers[4].address));
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [DAI_WHALE],
-    });
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [USDT_WHALE],
-    });
+    const dai: ERC20 = await hre.ethers.getContractAt("ERC20", DAI_ADDRESS);
+    const usdt: ERC20 = await hre.ethers.getContractAt("ERC20", USDT_ADDRESS);
     this.signers.admin = signers[0];
     this.signers.owner = signers[1];
     this.signers.deployer = signers[2];
     this.signers.alice = signers[3];
-    this.signers.daiWhale = await hre.ethers.getSigner(DAI_WHALE);
-    this.signers.usdtWhale = await hre.ethers.getSigner(USDT_WHALE);
-    const dai = await hre.ethers.getContractAt("IERC20", DAI_ADDRESS, this.signers.daiWhale);
-    const usdt = await hre.ethers.getContractAt("IERC20", USDT_ADDRESS, this.signers.usdtWhale);
 
     // get the UniswapV2Router contract instance
     this.uniswapV2Router02 = <IUniswapV2Router02>(
@@ -79,21 +64,8 @@ describe("Unit tests", function () {
       await deployContract(this.signers.deployer, testDeFiAdapterArtifact, [], getOverrideOptions())
     );
 
-    // fund the whale's wallet with gas
-    await this.signers.admin.sendTransaction({
-      to: DAI_WHALE,
-      value: hre.ethers.utils.parseEther("100"),
-      ...getOverrideOptions(),
-    });
-    await this.signers.admin.sendTransaction({
-      to: USDT_WHALE,
-      value: hre.ethers.utils.parseEther("100"),
-      ...getOverrideOptions(),
-    });
-
-    // fund TestDeFiAdapter with 10000 tokens each
-    await dai.transfer(this.testDeFiAdapter.address, hre.ethers.utils.parseEther("10000"), getOverrideOptions());
-    await usdt.transfer(this.testDeFiAdapter.address, hre.ethers.utils.parseUnits("10000", 6), getOverrideOptions());
+    await setTokenBalanceInStorage(dai, this.testDeFiAdapter.address, "10000");
+    await setTokenBalanceInStorage(usdt, this.testDeFiAdapter.address, "10000");
 
     // whitelist TestDeFiAdapter contract into HarvestFinance's Vaults
     // by impersonating the governance's address

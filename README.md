@@ -72,7 +72,7 @@ One of the most important dependencies is **@optyfi/defi-legos**. In that packag
 
 #### Step #3 - Pool(s), LP token(s) and underlying token(s) address gathering
 
-- Choose a DeFi protocol and gather the pool contract addresses similar to [harvest.finance-pools.json](./test/1_ethereum/harvest.finance/harvest.finance-pools.json).
+- Gather protocol pool data using [defi-legos](https://github.com/Opty-Fi/defi-legos). Make a PR in defi-legos repo for any missing data. It will get reviewed and published on `npm` by optyfi team
 
 #### Step #4 - Implementing `IAdapter` interface(s)
 

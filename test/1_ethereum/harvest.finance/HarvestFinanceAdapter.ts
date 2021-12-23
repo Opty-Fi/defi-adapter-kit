@@ -7,8 +7,8 @@ import { TestDeFiAdapter } from "../../../typechain/TestDeFiAdapter";
 import { LiquidityPool, Signers } from "../types";
 import { shouldBehaveLikeHarvestFinanceAdapter } from "./HarvestFinanceAdapter.behavior";
 import { default as HarvestExports } from "@optyfi/defi-legos/ethereum/harvest.finance/contracts";
-import { IUniswapV2Router02 } from "../../../typechain";
-import { getOverrideOptions } from "../../utils";
+import { ERC20, IUniswapV2Router02 } from "../../../typechain";
+import { getOverrideOptions, setTokenBalanceInStorage } from "../../utils";
 
 const { deployContract } = hre.waffle;
 
@@ -37,6 +37,9 @@ describe("Unit tests", function () {
     const DAI_WHALE: string = getAddress("0x47ac0fb4f2d84898e4d9e7b4dab3c24507a6d503");
     const USDT_WHALE: string = getAddress("0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503");
     const signers: SignerWithAddress[] = await hre.ethers.getSigners();
+    const dai20 = await hre.ethers.getContractAt("ERC20", DAI_ADDRESS);
+    await setTokenBalanceInStorage(dai20, signers[4].address, "200");
+    console.log(await dai20.balanceOf(signers[4].address));
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
       params: [DAI_WHALE],

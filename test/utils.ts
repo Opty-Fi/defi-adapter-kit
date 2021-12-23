@@ -1,5 +1,4 @@
 import { TransactionRequest } from "@ethersproject/providers";
-import { Contract } from "ethers";
 import hre, { ethers } from "hardhat";
 import { ERC20 } from "../typechain";
 

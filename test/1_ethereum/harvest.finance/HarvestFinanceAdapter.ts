@@ -1,58 +1,27 @@
 import hre from "hardhat";
 import { Artifact } from "hardhat/types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
-import { getAddress } from "ethers/lib/utils";
+import { default as HarvestExports } from "@optyfi/defi-legos/ethereum/harvest.finance/contracts";
 import { HarvestFinanceAdapter } from "../../../typechain/HarvestFinanceAdapter";
 import { TestDeFiAdapter } from "../../../typechain/TestDeFiAdapter";
 import { LiquidityPool, Signers } from "../types";
 import { shouldBehaveLikeHarvestFinanceAdapter } from "./HarvestFinanceAdapter.behavior";
-import { default as HarvestExports } from "@optyfi/defi-legos/ethereum/harvest.finance/contracts";
 import { IUniswapV2Router02 } from "../../../typechain";
 import { getOverrideOptions } from "../../utils";
 
 const { deployContract } = hre.waffle;
 
-const HarvestFinancePools = {
-  dai: {
-    pool: HarvestExports.harvestV1Pools.dai.pool,
-    stakingPool: HarvestExports.harvestV1Pools.dai.stakingVault,
-    lpToken: HarvestExports.harvestV1Pools.dai.lpToken,
-    tokens: HarvestExports.harvestV1Pools.dai.tokens,
-    rewardTokens: ["0xa0246c9032bC3A600820415aE600c6388619A14D"],
-  },
-  usdt: {
-    pool: HarvestExports.harvestV1Pools.usdt.pool,
-    stakingPool: HarvestExports.harvestV1Pools.usdt.stakingVault,
-    lpToken: HarvestExports.harvestV1Pools.usdt.lpToken,
-    tokens: HarvestExports.harvestV1Pools.usdt.tokens,
-    rewardTokens: ["0xa0246c9032bC3A600820415aE600c6388619A14D"],
-  },
-};
+const HarvestFinancePools = HarvestExports.harvestV1Pools;
 
 describe("Unit tests", function () {
   before(async function () {
     this.signers = {} as Signers;
-    const DAI_ADDRESS: string = getAddress("0x6b175474e89094c44da98b954eedeac495271d0f");
-    const USDT_ADDRESS: string = getAddress("0xdac17f958d2ee523a2206206994597c13d831ec7");
-    const DAI_WHALE: string = getAddress("0x47ac0fb4f2d84898e4d9e7b4dab3c24507a6d503");
-    const USDT_WHALE: string = getAddress("0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503");
     const signers: SignerWithAddress[] = await hre.ethers.getSigners();
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [DAI_WHALE],
-    });
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [USDT_WHALE],
-    });
     this.signers.admin = signers[0];
     this.signers.owner = signers[1];
     this.signers.deployer = signers[2];
     this.signers.alice = signers[3];
-    this.signers.daiWhale = await hre.ethers.getSigner(DAI_WHALE);
-    this.signers.usdtWhale = await hre.ethers.getSigner(USDT_WHALE);
-    const dai = await hre.ethers.getContractAt("IERC20", DAI_ADDRESS, this.signers.daiWhale);
-    const usdt = await hre.ethers.getContractAt("IERC20", USDT_ADDRESS, this.signers.usdtWhale);
+    this.signers.operator = await hre.ethers.getSigner("0x6bd60f089B6E8BA75c409a54CDea34AA511277f6");
 
     // get the UniswapV2Router contract instance
     this.uniswapV2Router02 = <IUniswapV2Router02>(
@@ -76,46 +45,37 @@ describe("Unit tests", function () {
       await deployContract(this.signers.deployer, testDeFiAdapterArtifact, [], getOverrideOptions())
     );
 
-    // fund the whale's wallet with gas
-    await this.signers.admin.sendTransaction({
-      to: DAI_WHALE,
-      value: hre.ethers.utils.parseEther("100"),
-      ...getOverrideOptions(),
+    // impersonate operator
+    await hre.network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [this.signers.operator.address],
     });
     await this.signers.admin.sendTransaction({
-      to: USDT_WHALE,
-      value: hre.ethers.utils.parseEther("100"),
+      to: this.signers.operator.address,
+      value: hre.ethers.utils.parseEther("10"),
       ...getOverrideOptions(),
     });
-
-    // fund TestDeFiAdapter with 10000 tokens each
-    await dai.transfer(this.testDeFiAdapter.address, hre.ethers.utils.parseEther("10000"), getOverrideOptions());
-    await usdt.transfer(this.testDeFiAdapter.address, hre.ethers.utils.parseUnits("10000", 6), getOverrideOptions());
 
     // whitelist TestDeFiAdapter contract into HarvestFinance's Vaults
     // by impersonating the governance's address
-    const tokenNames = Object.keys(HarvestFinancePools);
-    for (const tokenName of tokenNames) {
-      const { pool } = (HarvestFinancePools as LiquidityPool)[tokenName];
-      const harvestVault = await hre.ethers.getContractAt("IHarvestDeposit", pool);
-      const governance = await harvestVault.governance();
-      await hre.network.provider.request({
-        method: "hardhat_impersonateAccount",
-        params: [governance],
-      });
-      const harvestController = await hre.ethers.getContractAt(
-        "IHarvestController",
-        await harvestVault.controller(),
-        await hre.ethers.getSigner(governance),
-      );
-      await this.signers.admin.sendTransaction({
-        to: governance,
-        value: hre.ethers.utils.parseEther("1000"),
-        ...getOverrideOptions(),
-      });
-      await harvestController.addToWhitelist(this.testDeFiAdapter.address, getOverrideOptions());
-      await harvestController.addCodeToWhitelist(this.testDeFiAdapter.address, getOverrideOptions());
-    }
+    const harvestFinanceGovernance = "0xf00dD244228F51547f0563e60bCa65a30FBF5f7f";
+    const harvestFinanceController = "0x3cC47874dC50D98425ec79e647d83495637C55e3";
+    await hre.network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [harvestFinanceGovernance],
+    });
+    const harvestController = await hre.ethers.getContractAt(
+      "IHarvestController",
+      harvestFinanceController,
+      await hre.ethers.getSigner(harvestFinanceGovernance),
+    );
+    await this.signers.admin.sendTransaction({
+      to: harvestFinanceGovernance,
+      value: hre.ethers.utils.parseEther("1000"),
+      ...getOverrideOptions(),
+    });
+    await harvestController.addToWhitelist(this.testDeFiAdapter.address, getOverrideOptions());
+    await harvestController.addCodeToWhitelist(this.testDeFiAdapter.address, getOverrideOptions());
   });
 
   describe("HarvestFinanceAdapter", function () {

@@ -13,18 +13,17 @@ export interface Signers {
   charlie: SignerWithAddress;
   dave: SignerWithAddress;
   eve: SignerWithAddress;
-  daiWhale: SignerWithAddress;
-  usdtWhale: SignerWithAddress;
-  wethWhale: SignerWithAddress;
+  operator: SignerWithAddress;
 }
 
 export interface PoolItem {
   pool: string;
   lpToken: string;
-  stakingPool?: string;
+  stakingVault?: string;
   rewardTokens?: string[];
   tokens: string[];
   swap?: string;
+  deprecated?: boolean;
 }
 
 export interface LiquidityPool {

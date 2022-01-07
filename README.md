@@ -57,11 +57,9 @@ One of the most important dependencies is **@optyfi/defi-legos**. In that packag
 
 ### Developing DeFiAdapter
 
-#### Step #1 - Use this template
+This is a GitHub template, so click on green button "Use this template" on the top-right corner of the page to create new defi adapter.
 
-- This is a GitHub template, so click on green button "Use this template" on the top-right corner of the page to create new defi adapter.
-
-#### Step #2 - Explore the protocol
+#### Step #1 - Explore the protocol
 
 - Choose a DeFi protocol and dig into it. The deeper understanding you have of the protocol, the faster you will code the adapter and the better the adapter will be.
 - A suggested plan of attack is:
@@ -70,11 +68,11 @@ One of the most important dependencies is **@optyfi/defi-legos**. In that packag
   3. Find the fee model. **If the protocol have either deposit or withdrawal fee, it is not compatible with OptyFi's architecture**. If not, you can continue.
   4. Check protocol's smart contracts. Everything you need to know will be there: math models, functionalities, fees, rewards,...
 
-#### Step #3 - Pool(s), LP token(s) and underlying token(s) address gathering
+#### Step #2 - Pool(s), LP token(s) and underlying token(s) address gathering
 
-- Gather protocol pool data using [defi-legos](https://github.com/Opty-Fi/defi-legos). Make a PR in defi-legos repo for any missing data. It will get reviewed and published on `npm` by optyfi team
+- Choose a DeFi protocol and gather the pool contract addresses similar to [harvest.finance-pools.json](./test/1_ethereum/harvest.finance/harvest.finance-pools.json).
 
-#### Step #4 - Implementing `IAdapter` interface(s)
+#### Step #3 - Implementing `IAdapter` interface(s)
 
 - Implement an adapter contract using above interface(s) similar to [HarvestFinanceAdapter.sol](./contracts/1_ethereum/harvest.finance/HarvestFinanceAdapter.sol).
 - You just have to import the files and inherit the interfaces like this:
@@ -100,12 +98,17 @@ contract HarvestFinanceAdapter is IAdapterInvestLimit {
 
 - Take into account that most of the times, some of the interfaces can be omitted.
 
-#### Step #5 - Unit Tests
+#### Step #4 - Unit Tests
 
 - Write unit tests for all the functions across all the pool contracts gathered in Step 1.
 - You might want to use a test utility contract like [TestDeFiAdapter](./contracts/mock/TestDeFiAdapter.sol) for creating a sandbox environment to execute the transaction based on function signature and target address returned from `getCodes()`-style functions from DeFiAdapter.
 - All other functions can be directly tested from the DeFiAdapter contract.
 - The unit test for `HarvestFinanceAdapter.sol` can be found in [HarvestFinanceAdapter.ts](./test/1_ethereum/harvest.finance/HarvestFinanceAdapter.ts)
+
+#### Step #5 - Integration testing **(to be done by OptyFi's core team)**
+
+- OptyFi's developers would perform the new strategies that are now available thanks to your adapter.
+- If everything goes right, your adapter will be ready to be utilized by our vaults.
 
 #### Considerations when writing adapters
 

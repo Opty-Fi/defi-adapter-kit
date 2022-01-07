@@ -101,6 +101,7 @@ contract HarvestFinanceAdapter is IAdapterInvestLimit {
 #### Step #4 - Unit Tests
 
 - Write unit tests for all the functions across all the pool contracts gathered in Step 1.
+- Of course, all the pool contracts that you gathered at step 2 must be tested. That would help you to find some edge cases (sometimes it happens that only a couple of pools fail and we should know the reason and solve the issue if possible).
 - You might want to use a test utility contract like [TestDeFiAdapter](./contracts/mock/TestDeFiAdapter.sol) for creating a sandbox environment to execute the transaction based on function signature and target address returned from `getCodes()`-style functions from DeFiAdapter.
 - All other functions can be directly tested from the DeFiAdapter contract.
 - The unit test for `HarvestFinanceAdapter.sol` can be found in [HarvestFinanceAdapter.ts](./test/1_ethereum/harvest.finance/HarvestFinanceAdapter.ts)

@@ -3,7 +3,7 @@
 pragma solidity >0.6.0 <0.9.0;
 
 //  libraries
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import { Address } from "@openzeppelin/contracts-0.8.x/utils/Address.sol";
 
 // interfaces
 import { IAdapterModifiersBase } from "./interfaces/IAdapterModifiersBase.sol";

@@ -1423,17 +1423,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openzeppelin/contracts-0.8.x@npm:@openzeppelin/contracts@4.4.1":
+  version: 4.4.1
+  resolution: "@openzeppelin/contracts@npm:4.4.1"
+  checksum: 87ee7ebe8e6493fc4d657b05c5ddb5f254b73bf55d80c25a790f8e74087b6d90c0a6ec504fe45949c27501f73bca7d64129aad29488707a2c9b5afdb035966df
+  languageName: node
+  linkType: hard
+
 "@openzeppelin/contracts@npm:v3.4.0":
   version: 3.4.0
   resolution: "@openzeppelin/contracts@npm:3.4.0"
   checksum: 8c9d9b7f5207944c256b127c41fb7e47f3e4bb808e3a75096a77d217870c0d218c64706c9f9304d36e388d451a1eeed5ffdbbbad71a40973aceae349f305f382
-  languageName: node
-  linkType: hard
-
-"@openzeppelin/contracts@npm:v4.4.1":
-  version: 4.4.1
-  resolution: "@openzeppelin/contracts@npm:4.4.1"
-  checksum: 87ee7ebe8e6493fc4d657b05c5ddb5f254b73bf55d80c25a790f8e74087b6d90c0a6ec504fe45949c27501f73bca7d64129aad29488707a2c9b5afdb035966df
   languageName: node
   linkType: hard
 
@@ -1451,8 +1451,8 @@ __metadata:
     "@ethersproject/providers": ^5.5.1
     "@nomiclabs/hardhat-ethers": ^2.0.3
     "@nomiclabs/hardhat-waffle": ^2.0.1
-    "@openzeppelin/contracts": v4.4.1
-    "@optyfi/defi-legos": 0.1.0-rc.30
+    "@openzeppelin/contracts-0.8.x": "npm:@openzeppelin/contracts@4.4.1"
+    "@optyfi/defi-legos": 0.1.0-rc.33
     "@typechain/ethers-v5": ^8.0.5
     "@typechain/hardhat": ^3.1.0
     "@types/chai": ^4.3.0
@@ -1489,12 +1489,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@optyfi/defi-legos@npm:0.1.0-rc.30":
-  version: 0.1.0-rc.30
-  resolution: "@optyfi/defi-legos@npm:0.1.0-rc.30"
+"@optyfi/defi-legos@npm:0.1.0-rc.33":
+  version: 0.1.0-rc.33
+  resolution: "@optyfi/defi-legos@npm:0.1.0-rc.33"
   dependencies:
     "@openzeppelin/contracts": v3.4.0
-  checksum: e550f13480f7565acdedbd39a2ebbaf904c398c920fdc6137ade21c2dfcf6f600c61d6a314aa2948487c314e45b51a4c81164687c324206cd77b443e0b65688e
+  checksum: b2350ee85f1b5892fe767e596a7fd9a64105bb76874d286f14f853e7a26b5c2a801f0f7992a4cd50626e4680fe5e4cea1bb52e929b524d57b7aa8d5a6ea57da2
   languageName: node
   linkType: hard
 

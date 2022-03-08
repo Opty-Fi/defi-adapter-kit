@@ -111,8 +111,8 @@
     "node": ">=12.0.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "v4.4.1",
-    "@optyfi/defi-legos": "0.1.0-rc.30",
+    "@openzeppelin/contracts-0.8.x": "npm:@openzeppelin/contracts@4.4.1",
+    "@optyfi/defi-legos": "0.1.0-rc.33",
     "@uniswap/v2-periphery": "^1.1.0-beta.0"
   }
 }

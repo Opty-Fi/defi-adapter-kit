@@ -8,7 +8,7 @@ pragma solidity =0.8.11;
 /////////////////////////////////////////////////////
 
 //  libraries
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import { Address } from "@openzeppelin/contracts-0.8.x/utils/Address.sol";
 
 // helpers
 import { AdapterModifiersBase } from "../../utils/AdapterModifiersBase.sol";
@@ -16,7 +16,7 @@ import { AdapterModifiersBase } from "../../utils/AdapterModifiersBase.sol";
 //  interfaces
 import { IHarvestDeposit } from "@optyfi/defi-legos/ethereum/harvest.finance/contracts/IHarvestDeposit.sol";
 import { IHarvestFarm } from "@optyfi/defi-legos/ethereum/harvest.finance/contracts/IHarvestFarm.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts-0.8.x/token/ERC20/IERC20.sol";
 import { IAdapter } from "@optyfi/defi-legos/interfaces/defiAdapters/contracts/IAdapter.sol";
 import "@optyfi/defi-legos/interfaces/defiAdapters/contracts/IAdapterInvestLimit.sol";
 import { IAdapterStaking } from "@optyfi/defi-legos/interfaces/defiAdapters/contracts/IAdapterStaking.sol";
